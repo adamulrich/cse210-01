@@ -60,6 +60,7 @@ def draw_board(board_array,cell_format_length, row_separator):
         for row_iterator in range(size):
 
             #set up cell in center for display
+            #you have to do it this way because adding the color formatting changes the length, and so built in functions don't work right.
             cell = str(row[row_iterator])
             display_cell = cell.center(cell_format_length)
 
