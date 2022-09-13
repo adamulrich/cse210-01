@@ -2,7 +2,7 @@
 
 """
 Author: Adam Ulrich
-File: tictactoe.py
+File: TicTacToe.py
 
 Overview
 Tic-Tac-Toe is a game in which two players seek in alternate turns to complete a row, a column, or a diagonal with either three x's or three o's drawn in the spaces of a grid of nine squares.
@@ -46,37 +46,34 @@ current_user = PLAYER_1
 #swap users
 def swap_current_user():
     global current_user
-    if current_user == PLAYER_1:
-        current_user = PLAYER_2
-    else:
-        current_user = PLAYER_1
+    current_user = PLAYER_1 if current_user == PLAYER_2 else PLAYER_2
 
 
 # draw board function
 def draw_board(board_array,cell_format_length, row_separator):
     #clear screen
     os.system('cls' if os.name == 'nt' else 'clear')
-    counter = 1
-    for row in board_array:
-        #we iterate to the 
-        for cell in row[:-1]:
+    size = len(board_array)
+    for column_iterator in range(size):
+        row = board_array[column_iterator]
+        for row_iterator in range(size):
+            cell = row[row_iterator]
             print(f" {cell:{cell_format_length}} ",end="")
 
-            #print separator
-            print("|", end="")
-        
-        #print the last item in the row
-        cell = row[-1]
-        print(f" {cell:{cell_format_length}} ")
+            #if we aren't at the last item, print the cell separator
+            if row_iterator != size - 1:
+                print("|", end="")
 
-        #print the separator row
-        print(row_separator, end="")
-        for x in row[:-1]:
-            print("+" + row_separator,end="")
-        print()
+        # if we aren't at the last row, print the row separator
+        if column_iterator != size - 1:
+            print()
+            print(row_separator, end="")
+            for x in range(size - 1):
+                print("+" + row_separator,end="")
+            print()
+    print()
 
-
-def check_row(row):
+def check_list_for_win(row):
     #get the first cell
     first_cell = row[0]
     #if it has a player mark
@@ -92,13 +89,10 @@ def check_row(row):
     
     return return_value
 
-
-
-
 def check_for_win(board_array):
     #check rows
     for row in board_array:
-        row_check = check_row(row)
+        row_check = check_list_for_win(row)
         if row_check != False:
             return row_check
         
@@ -107,7 +101,7 @@ def check_for_win(board_array):
         #get column
         column = [item[i] for item in board_array]
         
-        column_check = check_row(column)
+        column_check = check_list_for_win(column)
         if column_check != False:
             return column_check
 
@@ -119,12 +113,12 @@ def check_for_win(board_array):
         diagonal1.append(board_array[x][x])
         diagonal2.append(board_array[x][diagonal_length - 1 - x])
 
-    diagonal_check = check_row(diagonal1)
+    diagonal_check = check_list_for_win(diagonal1)
     if diagonal_check != False:
         return diagonal_check
 
 
-    diagonal_check = check_row(diagonal2)
+    diagonal_check = check_list_for_win(diagonal2)
     if diagonal_check != False:
         return diagonal_check
 
@@ -143,6 +137,7 @@ def get_valid_user_input(board_array, cell_count):
     while True:
         print()
         try:
+            #get a number from the user for their move
             user_selection = int(input(f"{current_user}'s turn to choose a square (1 - {cell_count}): "))
         except:
             print("Invalid selection. Try again.")
@@ -150,21 +145,21 @@ def get_valid_user_input(board_array, cell_count):
             sleep(1)
             return
 
+        #check to see if it's valid
         selected_cell_good = False
         for row in board_array:
+
+            #if valid, set the location to the current user, and swap players and exit
             if user_selection in row:
-                selected_cell_good = True
                 row[row.index(user_selection)] = current_user
                 swap_current_user()
-        
-        if selected_cell_good == True:
-            return
-
-        else:
-            print("Invalid selection. Try again.")
-            print()
-            sleep(1)
-            return
+                return
+    
+        #we fell through, bad selection.
+        print("Invalid selection. Try again.")
+        print()
+        sleep(1)
+        return
             
 
 def get_numeric_input(prompt: str, var_type, min = None, max = None, round_digits = None) :
@@ -197,9 +192,6 @@ def get_numeric_input(prompt: str, var_type, min = None, max = None, round_digit
 
                 #if both check, return value
                 if min_check and max_check:
-                    #round it if needed
-                    if round_digits != None:
-                        return_value = half_round_away_from_zero(return_value,round_digits)
 
                     # cast back to correct type, handle special case for int.
                     if var_type != 'int':
@@ -214,32 +206,28 @@ def get_numeric_input(prompt: str, var_type, min = None, max = None, round_digit
         except (ValueError) :
             print(f"Not a valid {var_type}, try again.")
 
-
 # main 
 def main():
     
     #get board size
     os.system('cls' if os.name == 'nt' else 'clear')
-    board_size = get_numeric_input("Welcome to Tic Tac Toe. How big do you want your board to be? (3-10)",min=3,max=10,var_type=int)
+    board_size = get_numeric_input("Welcome to Tic Tac Toe. How big do you want your board to be? (3-10) -->",min=3,max=100,var_type=int)
 
     # create board data
     cell_format_length = len(str(board_size**2))
     row_separator = "-" * (cell_format_length + 2)
     cell_count = board_size**2
 
-    row_array = []
+    # create board, fill with numbers
+    row_list = []
     board_array = []
     counter = 1
     for row  in range(board_size):
-        row_array = []
+        row_list = []
         for column in range(board_size):
-            row_array.append(counter)
+            row_list.append(counter)
             counter += 1
-        board_array.append(row_array)
-
-    # set current user
-    current_user = PLAYER_1
-
+        board_array.append(row_list)
 
     #main loop
     while True:
