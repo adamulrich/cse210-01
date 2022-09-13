@@ -36,6 +36,7 @@ Enhanced game display (different colors for each player)
 
 import os
 from time import sleep
+from termcolor import colored
 
 PLAYER_1 = "X"
 PLAYER_2 = "O"
@@ -57,8 +58,18 @@ def draw_board(board_array,cell_format_length, row_separator):
     for column_iterator in range(size):
         row = board_array[column_iterator]
         for row_iterator in range(size):
-            cell = row[row_iterator]
-            print(f" {cell:{cell_format_length}} ",end="")
+
+            #set up cell in center for display
+            cell = str(row[row_iterator])
+            display_cell = cell.center(cell_format_length)
+
+            #add color
+            if cell == PLAYER_1:
+                display_cell = display_cell.replace(PLAYER_1, colored(cell,"blue"))
+            if cell == PLAYER_2:
+                display_cell = display_cell.replace(PLAYER_2, colored(cell,"red"))
+            
+            print(f" {display_cell} ",end="")
 
             #if we aren't at the last item, print the cell separator
             if row_iterator != size - 1:
